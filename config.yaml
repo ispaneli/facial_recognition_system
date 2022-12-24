@@ -1,0 +1,5 @@
+model:
+  prob_threshold: 0.8
+
+db:
+  mongo_url: !ENV ${FRS_MONGODB_URL}
