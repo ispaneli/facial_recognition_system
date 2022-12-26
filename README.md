@@ -22,6 +22,19 @@ pip install opencv-python --force-reinstall --no-cache-dir
 pip install face-recognition --force-reinstall --no-cache-dir
 ```
 
+## OpenCV highlighting problem in PyCharm Professional
+
+**At first, go to:**
+* PyCharm;
+* Settings...;
+* Project: <project_name>;
+* Python Interpreter;
+* Show all... in list of interpreters.
+
+**At second**:
+* select your interpreter;
+* press "Show Interpreter Paths";
+* add OpenCV-path (for example: */Users/admin/PycharmProjects/facial_recognition_system/venv/lib/python3.10/site-packages/cv2*)
 
 
 
