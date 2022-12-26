@@ -1,5 +1,14 @@
 # Facial recognition system backend (FastAPI and OpenCV)
 
+## Quick Start
+Configurate the environment:
+```bash
+export FRS_MONGODB_URL="<YOUR_MONGODB_URL>"
+export FRS_GLOBAL_SALT="<YOUR_GLOBAL_SALT>"
+export FRS_JWT_SECRET_KEY="<YOUR_SSL_SECRET_KEY>"
+pip install -r requirements.txt
+```
+
 ## 🍎 Errors on Apple silicon (M1, M2, etc.)
 
 ### Step 1.
