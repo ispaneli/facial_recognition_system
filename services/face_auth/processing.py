@@ -1,21 +1,32 @@
 import uuid
+from typing import BinaryIO
 
 import cv2
 import numpy as np
 import face_recognition as fr
+from pyaml_env import parse_config
+
+from models import MONGO_DB
 
 
-def img_to_encoding(img_path: str, model_tag: str = "cnn") -> np.ndarray:
+CONFIG = parse_config("config.yaml")
+
+
+async def photo_stream_to_encoding(
+    photo_stream: BinaryIO,
+    model_tag: str = 'cnn'
+) -> list[float]:
     """
     Converts a face photo to encoding.
 
-    :param str img_path: The path to the image.
+    :param BinaryIO photo_stream: The photo as byte string.
     :param str model_tag: The name of the model that will process the photo.
                           The 'hog' model is faster, the 'cnn' model is more accurate.
     :return: Encoding of the biggest face.
-    :rtype: np.ndarray
+    :rtype: list[float]
     """
-    rgb_layouts = cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB)
+    photo_as_np_array = np.asarray(bytearray(photo_stream.read()), dtype=np.uint8)
+    rgb_layouts = cv2.imdecode(photo_as_np_array, cv2.COLOR_BGR2RGB)
     face_boxes = fr.face_locations(rgb_layouts, model=model_tag)
 
     if not face_boxes:
@@ -30,19 +41,29 @@ def img_to_encoding(img_path: str, model_tag: str = "cnn") -> np.ndarray:
         main_face_idx = np.argmax(areas)
         face_boxes = (face_boxes[main_face_idx], )
 
-    return fr.face_encodings(rgb_layouts, face_boxes)[0]
+    return fr.face_encodings(rgb_layouts, face_boxes)[0].tolist()
 
 
-DATABASE_AS_MAP = dict()
-threshold = 0.8
-def who_is_it(img_path: str) -> uuid.UUID:
-    unknown_encoding = img_to_encoding(img_path)
+async def who_is_it(
+    photo_stream: BinaryIO,
+    model_tag: str = 'cnn'
+) -> str | None:
+    """
+    Searches for the employee in database of biometrics.
 
-    for user_id, encodings in DATABASE_AS_MAP.items():
-        prob = fr.compare_faces(np.array(encodings), unknown_encoding)
+    :param BinaryIO photo_stream: The photo as byte string.
+    :param str model_tag: The name of the model that will process the photo.
+                          The 'hog' model is faster, the 'cnn' model is more accurate.
+    :return: ID of the employee or None
+    :rtype: str
+    """
+    unknown_encoding = photo_stream_to_encoding(photo_stream, model_tag=model_tag)
 
-        if prob > threshold:
-            return user_id
+    async for biometric in MONGO_DB.biometrics.find():
+        prob = 0
+        for encoding in biometric['encodings']:
+            prob += fr.compare_faces(np.array(encoding), unknown_encoding)
+        prob /= len(biometric['encodings'])
 
-    raise ValueError("There is an unregistered user in the photo.")
-
+        if prob > CONFIG['model']['prob_threshold']:
+            return str(biometric['_id'])
