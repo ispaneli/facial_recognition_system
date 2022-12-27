@@ -1,5 +1,6 @@
 import hashlib
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import jwt
 from fastapi import HTTPException, Depends
@@ -7,7 +8,8 @@ from fastapi.security import OAuth2PasswordBearer
 from pyaml_env import parse_config
 
 
-CONFIG = parse_config("config.yaml")
+CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
+CONFIG = parse_config(str(CONFIG_PATH))
 OAUTH2_SCHEME = OAuth2PasswordBearer(
     tokenUrl='/sign_in',
     scheme_name='JWT'

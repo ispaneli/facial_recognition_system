@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -17,7 +18,8 @@ from ._jwt_logic import (
 )
 
 
-CONFIG = parse_config("config.yaml")
+CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
+CONFIG = parse_config(str(CONFIG_PATH))
 JWT_ROUTER = APIRouter(tags=['JWT Authentication'])
 
 

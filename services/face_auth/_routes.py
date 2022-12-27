@@ -1,4 +1,5 @@
 import uuid
+from pathlib import Path
 
 from fastapi import (
     APIRouter,
@@ -15,7 +16,8 @@ from services.jwt_auth import get_current_client
 from ._processing import photo_stream_to_encoding, who_is_it
 
 
-CONFIG = parse_config("config.yaml")
+CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
+CONFIG = parse_config(str(CONFIG_PATH))
 FR_ROUTER = APIRouter(tags=['Face recognition'])
 
 

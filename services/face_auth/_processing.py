@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import BinaryIO
 
 import cv2
@@ -8,7 +9,8 @@ from pyaml_env import parse_config
 from models import MONGO_DB
 
 
-CONFIG = parse_config("config.yaml")
+CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
+CONFIG = parse_config(str(CONFIG_PATH))
 
 
 async def photo_stream_to_encoding(
