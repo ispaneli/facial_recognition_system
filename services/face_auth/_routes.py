@@ -8,6 +8,7 @@ from fastapi import (
     File,
     status
 )
+from pyaml_env import parse_config
 
 from models import MONGO_DB
 from services.jwt_auth import get_current_client
@@ -15,6 +16,8 @@ from models.valid import EmployeeModel, UpdateEmployeeModel
 
 from .processing import photo_stream_to_encoding, who_is_it
 
+
+CONFIG = parse_config("config.yaml")
 FR_ROUTER = APIRouter(tags=['Face recognition'])
 
 
@@ -111,7 +114,7 @@ async def add_employee_biometrics(
         raise HTTPException(status_code=401, detail="Invalid ID of the employee.")
 
     new_encodings = [
-        await photo_stream_to_encoding(photo.file)
+        await photo_stream_to_encoding(photo.file, model_tag=CONFIG['model']['model_tag'])
         for photo in photos
     ]
 
@@ -153,7 +156,7 @@ async def replace_employee_biometrics(
     new_biometrics = {
         '_id': uuid.UUID(employee_id),
         'encodings': [
-            await photo_stream_to_encoding(photo.file)
+            await photo_stream_to_encoding(photo.file, model_tag=CONFIG['model']['model_tag'])
             for photo in photos
         ]
     }
@@ -176,7 +179,7 @@ async def find_employee_by_biometrics(
     :return: ID of the employee.
     :rtype: dict[str, str]
     """
-    employee_id = await who_is_it(photo.file)
+    employee_id = await who_is_it(photo.file, model_tag=CONFIG['model']['model_tag'])
     if employee_id:
         return {'_id': employee_id}
 

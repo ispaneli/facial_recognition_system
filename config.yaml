@@ -29,6 +29,7 @@ jwt:
 
 model:
   prob_threshold: 0.8
+  model_tag: cnn
 
 clients:
   - login: admin
