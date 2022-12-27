@@ -5,11 +5,13 @@ from fastapi import FastAPI
 from pyaml_env import parse_config
 
 from services.jwt_auth import JWT_ROUTER, create_config_clients
+from services.face_auth import FR_ROUTER
 
 
 CONFIG = parse_config("config.yaml")
 FRS_APP = FastAPI(title="Facial Recognition System (FastAPI + OpenCV)")
 FRS_APP.include_router(JWT_ROUTER)
+FRS_APP.include_router(FR_ROUTER)
 
 
 if __name__ == '__main__':
