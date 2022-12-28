@@ -7,7 +7,7 @@ from models.valid import EmployeeModel, UpdateEmployeeModel
 from services.jwt_auth import get_current_client
 
 
-EMPLOYEE_ROUTER = APIRouter(tags=['Face recognition'])
+EMPLOYEE_ROUTER = APIRouter(tags=['Employees'])
 
 
 @EMPLOYEE_ROUTER.post('/add_employee')
