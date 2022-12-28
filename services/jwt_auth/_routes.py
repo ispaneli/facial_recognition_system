@@ -72,13 +72,6 @@ async def refresh_tokens(refresh_model: RefreshTokenModel) -> dict[str, str]:
     }
 
 
-@JWT_ROUTER.post('/test_private_method')
-async def test_private_method(
-        client: dict[str, str] = Depends(get_current_client)
-) -> dict[str, bool]:
-    return {'auth_status': True}
-
-
 async def create_config_clients(clear_db: bool = True) -> None:
     """
     Creates all clients from config.yaml.
