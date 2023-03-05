@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from datetime import datetime, timezone
 
@@ -68,24 +69,37 @@ async def refresh_tokens(refresh_model: RefreshTokenModel) -> dict[str, str]:
     }
 
 
-async def create_clients(clear_db: bool = True) -> None:
+def create_clients() -> None:
     """
-    Creates all clients from config.yaml.
+    Creates all clients from config.yaml
 
-    :param bool clear_db: If True, all data will be deleted.
     :return: None
     """
-    if clear_db:
-        collections = await MONGO_DB.list_collection_names()
-        for collection_name in collections:
-            await MONGO_DB.drop_collection(collection_name)
+    async def _async_create_clients(clear_db: bool = True) -> None:
+        """
+        Async creates all clients from config.yaml.
 
-    for client in CONFIG['clients']:
-        client.update({
-            '_id': uuid.uuid4(),
-            'password': await encode_password(client['login'], client['password'])
-        })
-        await MONGO_DB.clients.insert_one(client)
+        :param bool clear_db: If True, all data will be deleted.
+        :return: None
+        """
+        if clear_db:
+            collections = await MONGO_DB.list_collection_names()
+            for collection_name in collections:
+                await MONGO_DB.drop_collection(collection_name)
+
+        for client in CONFIG['clients']:
+            client.update({
+                '_id': uuid.uuid4(),
+                'password': await encode_password(client['login'], client['password'])
+            })
+            await MONGO_DB.clients.insert_one(client)
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(_async_create_clients(
+        clear_db=CONFIG['fastapi_service']['clear_db']
+    ))
+    loop.close()
 
 
 async def expired_tokens_killer() -> None:
