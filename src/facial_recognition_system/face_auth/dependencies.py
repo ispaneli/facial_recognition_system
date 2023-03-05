@@ -57,13 +57,17 @@ async def get_employee_by_img(
     :return: ID of the employee or None
     :rtype: str
     """
-    unknown_encoding = encode_img_stream(photo_stream, model_tag=model_tag)
+    unknown_encoding = await encode_img_stream(photo_stream, model_tag=model_tag)
+    unknown_encoding = np.array(unknown_encoding)
 
     async for biometric in MONGO_DB.biometrics.find():
-        prob = 0
-        for encoding in biometric['encodings']:
-            prob += fr.compare_faces(np.array(encoding), unknown_encoding)
-        prob /= len(biometric['encodings'])
+        known_encodings = [
+            np.array(encoding)
+            for encoding in biometric['encodings']
+        ]
 
-        if prob > CONFIG['model']['prob_threshold']:
+        comparisons = fr.compare_faces(known_encodings, unknown_encoding)
+        probability = sum(comparisons) / len(comparisons)
+
+        if probability > CONFIG['model']['prob_threshold']:
             return str(biometric['_id'])
