@@ -6,16 +6,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from pyaml_env import parse_config
 
-from models import MONGO_DB
-from models.valid import RefreshTokenModel
-
-from ._jwt_logic import (
+from src.facial_recognition_system.database import MONGO_DB
+from src.facial_recognition_system.jwt_auth import (
     encode_password,
     verify_password,
     decode_token,
     generate_new_tokens,
     get_current_client
 )
+
+from .schemas import RefreshTokenModel
 
 
 CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
