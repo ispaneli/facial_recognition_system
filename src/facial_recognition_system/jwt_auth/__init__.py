@@ -5,6 +5,7 @@ from .dependencies import (
     generate_new_tokens,
     get_current_client
 )
+from .router import create_clients
 
 
 __all__ = [
@@ -12,5 +13,6 @@ __all__ = [
     "verify_password",
     "decode_token",
     "generate_new_tokens",
-    "get_current_client"
+    "get_current_client",
+    "create_clients"
 ]

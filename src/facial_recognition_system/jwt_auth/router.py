@@ -68,7 +68,7 @@ async def refresh_tokens(refresh_model: RefreshTokenModel) -> dict[str, str]:
     }
 
 
-async def create_config_clients(clear_db: bool = True) -> None:
+async def create_clients(clear_db: bool = True) -> None:
     """
     Creates all clients from config.yaml.
 
