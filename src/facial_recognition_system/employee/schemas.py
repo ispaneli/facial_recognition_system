@@ -1,3 +1,5 @@
+from datetime import date
+
 from pydantic import BaseModel, Field
 
 
@@ -8,15 +10,13 @@ class EmployeeModel(BaseModel):
     first_name: str
     second_name: str
 
-    date_of_birth: str = None
+    date_of_birth: date = None
     phone: int = None
     email: str = None
     home_address: str = None
 
     position: str = None
     other_info: str = None
-
-    # TODO: Add validation of 'date_of_birth' field.
 
 
 class UpdateEmployeeModel(EmployeeModel):
