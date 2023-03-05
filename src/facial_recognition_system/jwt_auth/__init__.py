@@ -6,6 +6,7 @@ from .dependencies import (
     get_current_client
 )
 from .router import create_clients
+from .router import ROUTER as JWT_ROUTER
 
 
 __all__ = [
@@ -14,5 +15,6 @@ __all__ = [
     "decode_token",
     "generate_new_tokens",
     "get_current_client",
-    "create_clients"
+    "create_clients",
+    "JWT_ROUTER"
 ]
