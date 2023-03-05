@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
-from src.facial_recognition_system.config import CONFIG
+from src.facial_recognition_system.config import CONFIG, LOG_CONFIG_PATH
 from src.facial_recognition_system.employee import EMPLOYEE_ROUTER
 from src.facial_recognition_system.face_auth import FACE_ROUTER
 from src.facial_recognition_system.jwt_auth import create_clients, JWT_ROUTER
@@ -19,6 +19,7 @@ if __name__ == '__main__':
         'main:FRS_APP',
         host=CONFIG['fastapi_service']['host'],
         port=CONFIG['fastapi_service']['port'],
+        log_config=LOG_CONFIG_PATH,
         reload=CONFIG['fastapi_service']['reload'],
         workers=CONFIG['fastapi_service']['workers_count']
     )
