@@ -1,17 +1,14 @@
 import asyncio
-from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
-from pyaml_env import parse_config
 
 from services.jwt_auth import JWT_ROUTER, create_config_clients
 from services.employee import EMPLOYEE_ROUTER
 from services.face_auth import FR_ROUTER
 
+from src.facial_recognition_system.config import CONFIG
 
-CONFIG_PATH = Path(__file__).parent / "config.yaml"
-CONFIG = parse_config(str(CONFIG_PATH))
 
 FRS_APP = FastAPI(title="Facial Recognition System (FastAPI + OpenCV)")
 FRS_APP.include_router(JWT_ROUTER)

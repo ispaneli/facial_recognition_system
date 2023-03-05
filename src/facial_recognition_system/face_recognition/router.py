@@ -1,5 +1,4 @@
 import uuid
-from pathlib import Path
 
 from fastapi import (
     APIRouter,
@@ -8,16 +7,14 @@ from fastapi import (
     UploadFile,
     File
 )
-from pyaml_env import parse_config
 
+from src.facial_recognition_system.config import CONFIG
 from src.facial_recognition_system.database import MONGO_DB
 from src.facial_recognition_system.jwt_auth import get_current_client
 
 from .dependencies import encode_img_stream, get_employee_by_img
 
 
-CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
-CONFIG = parse_config(str(CONFIG_PATH))
 ROUTER = APIRouter(tags=['Face recognition'], prefix="/biometrics")
 
 

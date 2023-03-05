@@ -1,29 +1,25 @@
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from pyaml_env import parse_config
 
+from src.facial_recognition_system.config import CONFIG
 from src.facial_recognition_system.database import MONGO_DB
 from src.facial_recognition_system.jwt_auth import (
     encode_password,
     verify_password,
     decode_token,
-    generate_new_tokens,
-    get_current_client
+    generate_new_tokens
 )
 
 from .schemas import RefreshTokenModel
 
 
-CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
-CONFIG = parse_config(str(CONFIG_PATH))
-JWT_ROUTER = APIRouter(tags=['JWT Authentication'])
+ROUTER = APIRouter(tags=['JWT Authentication'])
 
 
-@JWT_ROUTER.post('/sign_in')
+@ROUTER.post("/sign_in")
 async def sign_in(client: OAuth2PasswordRequestForm = Depends()) -> dict[str, str]:
     """
     Authentication of an existing client equipment by login and password.
@@ -48,7 +44,7 @@ async def sign_in(client: OAuth2PasswordRequestForm = Depends()) -> dict[str, st
     }
 
 
-@JWT_ROUTER.post('/refresh_tokens')
+@ROUTER.post("/refresh_tokens")
 async def refresh_tokens(refresh_model: RefreshTokenModel) -> dict[str, str]:
     """
     Refreshes access and refresh tokens of user model.

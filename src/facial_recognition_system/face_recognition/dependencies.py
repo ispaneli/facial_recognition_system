@@ -1,17 +1,12 @@
-from pathlib import Path
 from typing import BinaryIO
 
 import cv2
 import numpy as np
 import face_recognition as fr
 from fastapi import HTTPException
-from pyaml_env import parse_config
 
+from src.facial_recognition_system.config import CONFIG
 from src.facial_recognition_system.database import MONGO_DB
-
-
-CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
-CONFIG = parse_config(str(CONFIG_PATH))
 
 
 async def encode_img_stream(
