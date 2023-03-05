@@ -3,7 +3,7 @@ from fastapi import FastAPI
 
 from src.facial_recognition_system.config import CONFIG
 from src.facial_recognition_system.employee import EMPLOYEE_ROUTER
-from src.facial_recognition_system.face_recognition import FACE_ROUTER
+from src.facial_recognition_system.face_auth import FACE_ROUTER
 from src.facial_recognition_system.jwt_auth import create_clients, JWT_ROUTER
 
 
