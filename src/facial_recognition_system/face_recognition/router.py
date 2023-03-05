@@ -10,19 +10,19 @@ from fastapi import (
 )
 from pyaml_env import parse_config
 
-from models import MONGO_DB
-from services.jwt_auth import get_current_client
+from src.facial_recognition_system.database import MONGO_DB
+from src.facial_recognition_system.jwt_auth import get_current_client
 
-from ._processing import photo_stream_to_encoding, who_is_it
+from .dependencies import encode_img_stream, get_employee_by_img
 
 
 CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
 CONFIG = parse_config(str(CONFIG_PATH))
-FR_ROUTER = APIRouter(tags=['Face recognition'])
+ROUTER = APIRouter(tags=['Face recognition'], prefix="/biometrics")
 
 
-@FR_ROUTER.post('/add_employee_biometrics/{employee_id}')
-async def add_employee_biometrics(
+@ROUTER.post("/{employee_id}")
+async def create(
         employee_id: str,
         photos: list[UploadFile] = File(...),
         client: dict[str, str] = Depends(get_current_client)
@@ -41,11 +41,13 @@ async def add_employee_biometrics(
         raise HTTPException(status_code=401, detail="Invalid ID of the employee.")
 
     new_encodings = [
-        await photo_stream_to_encoding(photo.file, model_tag=CONFIG['model']['model_tag'])
+        await encode_img_stream(photo.file, model_tag=CONFIG['model']['model_tag'])
         for photo in photos
     ]
 
-    existing_biometrics = await MONGO_DB.biometrics.find_one({'_id': uuid.UUID(employee_id)})
+    existing_biometrics = await MONGO_DB.biometrics.find_one(
+        {'_id': uuid.UUID(employee_id)}
+    )
     if existing_biometrics:
         existing_biometrics['encodings'] += new_encodings
         await MONGO_DB.biometrics.replace_one(
@@ -61,8 +63,8 @@ async def add_employee_biometrics(
     return {'_id': employee_id}
 
 
-@FR_ROUTER.patch('/replace_employee_biometrics/{employee_id}')
-async def replace_employee_biometrics(
+@ROUTER.patch("/{employee_id}")
+async def update(
         employee_id: str,
         photos: list[UploadFile] = File(...),
         client: dict[str, str] = Depends(get_current_client)
@@ -83,7 +85,10 @@ async def replace_employee_biometrics(
     new_biometrics = {
         '_id': uuid.UUID(employee_id),
         'encodings': [
-            await photo_stream_to_encoding(photo.file, model_tag=CONFIG['model']['model_tag'])
+            await encode_img_stream(
+                photo.file,
+                model_tag=CONFIG['model']['model_tag']
+            )
             for photo in photos
         ]
     }
@@ -93,8 +98,8 @@ async def replace_employee_biometrics(
     return {'_id': employee_id}
 
 
-@FR_ROUTER.post('/find_employee_by_biometrics')
-async def find_employee_by_biometrics(
+@ROUTER.post("/")
+async def find(
     photo: UploadFile = File(...),
     client: dict[str, str] = Depends(get_current_client)
 ) -> dict[str, str]:
@@ -106,7 +111,10 @@ async def find_employee_by_biometrics(
     :return: ID of the employee.
     :rtype: dict[str, str]
     """
-    employee_id = await who_is_it(photo.file, model_tag=CONFIG['model']['model_tag'])
+    employee_id = await get_employee_by_img(
+        photo.file,
+        model_tag=CONFIG['model']['model_tag']
+    )
     if employee_id:
         return {'_id': employee_id}
 
