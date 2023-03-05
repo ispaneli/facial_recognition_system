@@ -2,16 +2,17 @@ import uuid
 
 from fastapi import APIRouter, Depends, status
 
-from models import MONGO_DB
-from models.valid import EmployeeModel, UpdateEmployeeModel
-from services.jwt_auth import get_current_client
+from src.facial_recognition_system.database import MONGO_DB
+from src.facial_recognition_system.jwt_auth import get_current_client
+
+from .schemas import EmployeeModel, UpdateEmployeeModel
 
 
-EMPLOYEE_ROUTER = APIRouter(tags=['Employees'])
+ROUTER = APIRouter(tags=['Employees'], prefix="/employee")
 
 
-@EMPLOYEE_ROUTER.post('/add_employee')
-async def add_employee(
+@ROUTER.post("/")
+async def create(
         employee: EmployeeModel,
         client: dict[str, str] = Depends(get_current_client)
 ) -> dict[str, str]:
@@ -30,8 +31,8 @@ async def add_employee(
     return {'_id': employee_params['_id']}
 
 
-@EMPLOYEE_ROUTER.get('/get_employees')
-async def get_employees(
+@ROUTER.get("/")
+async def get_all(
         client: dict[str, str] = Depends(get_current_client)
 ) -> list[dict[str, ...]]:
     """
@@ -47,7 +48,7 @@ async def get_employees(
     ]
 
 
-@EMPLOYEE_ROUTER.get('/get_employee/{employee_id}')  # +
+@ROUTER.get("/{employee_id}")
 async def get_employee(
         employee_id: str,
         client: dict[str, str] = Depends(get_current_client)
@@ -63,8 +64,8 @@ async def get_employee(
     return await MONGO_DB.employees.find_one({'_id': uuid.UUID(employee_id)})
 
 
-@EMPLOYEE_ROUTER.put('/update_employee')
-async def update_employee(
+@ROUTER.put("/")
+async def update(
         updated_employee: UpdateEmployeeModel,
         client: dict[str, str] = Depends(get_current_client)
 ) -> dict[str, str]:
@@ -78,13 +79,13 @@ async def update_employee(
     """
     replacement = {'_id': uuid.UUID(updated_employee.id)}
     updated_employee_params = updated_employee.dict(exclude={'id'})
-    print(replacement, updated_employee_params)
     await MONGO_DB.employees.replace_one(replacement, updated_employee_params)
+
     return {'_id': updated_employee.id}
 
 
-@EMPLOYEE_ROUTER.delete('/delete_employee/{employee_id}', status_code=status.HTTP_200_OK)
-async def delete_employee(
+@ROUTER.delete("/{employee_id}", status_code=status.HTTP_200_OK)
+async def delete(
         employee_id: str,
         client: dict[str, str] = Depends(get_current_client)
 ) -> None:
