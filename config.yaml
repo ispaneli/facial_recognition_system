@@ -1,0 +1,45 @@
+fastapi_service:
+  host: "127.0.0.1"
+  port: 8000
+  reload: True
+  workers_count: 4
+  clear_db: True
+
+db:
+  mongo_url: !ENV ${FRS_MONGODB_URL}
+  timeout: 15000
+
+password:
+  hash_function: sha256
+  hash_global_salt: !ENV ${FRS_GLOBAL_SALT}
+  hash_complexity: 500000
+
+jwt:
+  # To get a string like this, run: $ openssl rand -hex 32
+  ssl_secret_key: !ENV ${FRS_JWT_SECRET_KEY}
+  algorithm: HS256
+  access_token:
+    expire_days: 0
+    expire_hours: 1
+    expire_minutes: 0
+  refresh_token:
+    expire_days: 0
+    expire_hours: 12
+    expire_minutes: 0
+
+model:
+  prob_threshold: 0.8
+  model_tag: cnn
+
+clients:
+  - login: admin
+    password: admin
+  - login: camera_1
+    password: "CjtamBX%sav7284zEeYn"
+  - login: camera_2
+    password: "83G)5!1:q8@JK#0sPYNv"
+  - login: camera_3
+    password: "k!7%75Zz:Q82J-Y0_Uq*"
+
+
+
