@@ -4,16 +4,17 @@ from typing import BinaryIO
 import cv2
 import numpy as np
 import face_recognition as fr
+from fastapi import HTTPException
 from pyaml_env import parse_config
 
-from models import MONGO_DB
+from src.facial_recognition_system.database import MONGO_DB
 
 
 CONFIG_PATH = Path(__file__).parents[2] / "config.yaml"
 CONFIG = parse_config(str(CONFIG_PATH))
 
 
-async def photo_stream_to_encoding(
+async def encode_img_stream(
     photo_stream: BinaryIO,
     model_tag: str = 'cnn'
 ) -> list[float]:
@@ -31,7 +32,10 @@ async def photo_stream_to_encoding(
     face_boxes = fr.face_locations(rgb_layouts, model=model_tag)
 
     if not face_boxes:
-        raise ValueError("There is no face in the photo.")
+        raise HTTPException(
+            404,
+            detail="There is no face in the photo."
+        )
 
     if len(face_boxes) > 1:
         # Search for box with the maximum area.
@@ -45,7 +49,7 @@ async def photo_stream_to_encoding(
     return fr.face_encodings(rgb_layouts, face_boxes)[0].tolist()
 
 
-async def who_is_it(
+async def get_employee_by_img(
     photo_stream: BinaryIO,
     model_tag: str = 'cnn'
 ) -> str | None:
@@ -58,7 +62,7 @@ async def who_is_it(
     :return: ID of the employee or None
     :rtype: str
     """
-    unknown_encoding = photo_stream_to_encoding(photo_stream, model_tag=model_tag)
+    unknown_encoding = encode_img_stream(photo_stream, model_tag=model_tag)
 
     async for biometric in MONGO_DB.biometrics.find():
         prob = 0
