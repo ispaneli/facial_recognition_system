@@ -1,4 +1,4 @@
-# Facial recognition system backend (FastAPI and OpenCV)
+# Facial recognition system backend (FastAPI&OpenCV)
 
 ## ▶️ Quick Start
 
