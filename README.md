@@ -49,8 +49,12 @@ pip install face-recognition --force-reinstall --no-cache-dir
 * Show all... in list of interpreters;
 * select your interpreter;
 * press "Show Interpreter Paths";
-* add OpenCV-path (for example: */Users/admin/PycharmProjects/facial_recognition_system/venv/lib/python3.10/site-packages/cv2*)
+* add OpenCV-path.
 
+**OpenCV path example:**
+```
+/Users/admin/PycharmProjects/facial_recognition_system/venv/lib/python3.10/site-packages/cv2
+```
 
 
 
