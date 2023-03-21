@@ -1,7 +1,7 @@
 FROM python:3.10
 
 WORKDIR /fr_system
-COPY ./requirements-base.txt /fr_system/requirements-base.txt
+COPY ./requirements/base.txt /fr_system/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /fr_system/requirements.txt
 
 COPY ./src /fr_system/src
